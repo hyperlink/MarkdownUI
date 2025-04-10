@@ -53,7 +53,23 @@ private struct TextInlineRenderer {
   private mutating func render(_ inline: InlineNode) {
     switch inline {
     case .text(let content):
-      self.renderText(content)
+        // Special handling for text that starts with space
+        if content.hasPrefix(" ") {
+          // Split into two parts: the space and the rest
+          let space = Text(" ")
+          let restOfContent = String(content.dropFirst())
+
+          // Add the space separately, then the rest
+          self.result = self.result + space
+
+          // Only add the rest if there is content after the space
+          if !restOfContent.isEmpty {
+            defaultRender(.text(restOfContent))
+          }
+        } else {
+          // Normal text rendering for content without leading space
+          self.renderText(content)
+        }
     case .softBreak:
       self.renderSoftBreak()
     case .html(let content):
